@@ -42,8 +42,13 @@ router.post('/courses', adminMiddleware, async (req, res) => {
 
 });
 
-router.get('/courses', adminMiddleware, (req, res) => {
-    // Implement fetching all courses logic
+router.get('/courses', adminMiddleware, async (req, res) => {
+    // Implement admin get courses logic
+    const allCourses = await Course.find({})
+    if(allCourses){
+        return res.status(200).json(allCourses.map((res)=>({...res['_doc'],published:true})))
+    }
+    res.status(400).json({message:'No courses found'})
 });
 
 module.exports = router;
