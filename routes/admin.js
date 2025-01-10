@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const adminMiddleware = require("../middleware/admin");
-const {Admin} = require("../db");
+const {Admin, Course} = require("../db");
 const router = Router();
 
 // Admin Routes
@@ -25,8 +25,21 @@ router.post('/signup', async (req, res) => {
 
 });
 
-router.post('/courses', adminMiddleware, (req, res) => {
-    // Implement course creation logic
+router.post('/courses', adminMiddleware, async (req, res) => {
+    const body = req.body
+    console.log(body.title)
+    try {
+        if(!body.title || !body.price || !body.description || !body.imageLink){
+            return res.status(400).json({message:'All fields are required'})
+        }
+        const createNewCourse = new Course({title:body.title,price:body.price,description:body.description,imageLink:body.imageLink})
+        console.log(createNewCourse)
+        await createNewCourse.save()
+        res.status(200).json({ message: "Course created successfully" ,courseId:createNewCourse._id});
+    }catch(e){
+            res.status(500).json({ message: "Error creating course", error: e.message });
+    }
+
 });
 
 router.get('/courses', adminMiddleware, (req, res) => {
